@@ -44,9 +44,13 @@ export default {
         },
         async beforeMount() {
             const res = await fetch('/api/status');
-            const data = await res.json();
-            this.isLoged=data.isLoged;
-            this.favorites=data.favorites;
+            const resr = await res.json();
+            if(resr.code){
+                alert(r2r.error_description);
+            }
+            else {
+               this.isLoged=resr.isLoged;
+            this.favorites=resr.favorites;
             this.pairs = Object.keys(this.favorites);
             const that=this;
              for(let i=0; i<that.pairs.length; i++){
@@ -85,7 +89,9 @@ export default {
                         }
                         
                     }
+            } 
             }
+            
         } ,
 
 }

@@ -2194,15 +2194,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 14:
               r2r = _context2.sent;
-              _this2.lastPrice = r2r.last_price;
-              _this2.high = r2r.high;
-              _this2.low = r2r.low;
 
               if (r2r.code) {
                 alert(r2r.error_description);
+              } else {
+                _this2.lastPrice = r2r.last_price;
+                _this2.high = r2r.high;
+                _this2.low = r2r.low;
               }
 
-            case 19:
+            case 16:
             case "end":
               return _context2.stop();
           }
@@ -2276,8 +2277,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var res, data, that, _loop, i;
-
+      var res, resr;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -2291,51 +2291,58 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return res.json();
 
             case 5:
-              data = _context.sent;
-              _this.isLoged = data.isLoged;
-              _this.favorites = data.favorites;
-              _this.pairs = Object.keys(_this.favorites);
-              that = _this;
+              resr = _context.sent;
 
-              _loop = function _loop(i) {
-                var np = {
-                  name: that.pairs[i],
-                  last: null,
-                  change: null,
-                  changePercentage: null,
-                  high: null,
-                  low: null
-                };
-                that.tradingPairs.push(np);
-                var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
+              if (resr.code) {
+                alert(r2r.error_description);
+              } else {
+                (function () {
+                  _this.isLoged = resr.isLoged;
+                  _this.favorites = resr.favorites;
+                  _this.pairs = Object.keys(_this.favorites);
+                  var that = _this;
 
-                ws.onopen = function () {
-                  ws.send(JSON.stringify({
-                    event: 'subscribe',
-                    channel: 'ticker',
-                    symbol: 'tBTCUSD'
-                  }));
-                };
+                  var _loop = function _loop(i) {
+                    var np = {
+                      name: that.pairs[i],
+                      last: null,
+                      change: null,
+                      changePercentage: null,
+                      high: null,
+                      low: null
+                    };
+                    that.tradingPairs.push(np);
+                    var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
-                ws.onmessage = function (msg) {
-                  var response = JSON.parse(msg.data);
-                  console.log(that.pairs[i], response);
+                    ws.onopen = function () {
+                      ws.send(JSON.stringify({
+                        event: 'subscribe',
+                        channel: 'ticker',
+                        symbol: 'tBTCUSD'
+                      }));
+                    };
 
-                  if (response[1] && response[1] != "hb") {
-                    that.tradingPairs[i].last = response[1][6].toFixed(2);
-                    that.tradingPairs[i].change = response[1][4].toFixed(2);
-                    that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
-                    that.tradingPairs[i].high = response[1][8].toFixed(2);
-                    that.tradingPairs[i].low = response[1][9].toFixed(2);
+                    ws.onmessage = function (msg) {
+                      var response = JSON.parse(msg.data);
+                      console.log(that.pairs[i], response);
+
+                      if (response[1] && response[1] != "hb") {
+                        that.tradingPairs[i].last = response[1][6].toFixed(2);
+                        that.tradingPairs[i].change = response[1][4].toFixed(2);
+                        that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
+                        that.tradingPairs[i].high = response[1][8].toFixed(2);
+                        that.tradingPairs[i].low = response[1][9].toFixed(2);
+                      }
+                    };
+                  };
+
+                  for (var i = 0; i < that.pairs.length; i++) {
+                    _loop(i);
                   }
-                };
-              };
-
-              for (i = 0; i < that.pairs.length; i++) {
-                _loop(i);
+                })();
               }
 
-            case 12:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -2365,6 +2372,12 @@ __webpack_require__.r(__webpack_exports__);
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 //
 //
@@ -2403,14 +2416,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     handlePercentage: function handlePercentage(num) {
       num = num * 100;
       return num > 0 ? '+' + num.toFixed(2) + '%' : num.toFixed(2) + '%';
+    },
+    getTopFive: function getTopFive(array) {
+      var array2 = array.slice(0, 5);
+      var result = [];
+
+      var _iterator = _createForOfIteratorHelper(array2),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var mem = _step.value;
+          result.push(mem.toUpperCase());
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      return result;
     }
   },
   beforeMount: function beforeMount() {
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var res, resr, that, _loop, i;
-
+      var res, resr;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -2432,58 +2464,55 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 5:
               resr = _context.sent;
-              _context.next = 8;
-              return resr.slice(0, 5);
-
-            case 8:
-              _this.pairs = _context.sent;
 
               if (resr.code) {
                 alert(resr.error_description);
-              } // const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
+              } else {
+                (function () {
+                  _this.pairs = _this.getTopFive(resr);
+                  var that = _this;
 
+                  var _loop = function _loop(i) {
+                    var np = {
+                      name: that.pairs[i],
+                      last: null,
+                      change: null,
+                      changePercentage: null,
+                      high: null,
+                      low: null
+                    };
+                    that.tradingPairs.push(np);
+                    var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
-              that = _this;
+                    ws.onopen = function () {
+                      ws.send(JSON.stringify({
+                        event: 'subscribe',
+                        channel: 'ticker',
+                        symbol: 't' + that.pairs[i]
+                      }));
+                    };
 
-              _loop = function _loop(i) {
-                var np = {
-                  name: that.pairs[i],
-                  last: null,
-                  change: null,
-                  changePercentage: null,
-                  high: null,
-                  low: null
-                };
-                that.tradingPairs.push(np);
-                var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
+                    ws.onmessage = function (msg) {
+                      var response = JSON.parse(msg.data);
+                      console.log(that.pairs[i], response);
 
-                ws.onopen = function () {
-                  ws.send(JSON.stringify({
-                    event: 'subscribe',
-                    channel: 'ticker',
-                    symbol: 'tBTCUSD'
-                  }));
-                };
+                      if (response[1] && response[1] != "hb") {
+                        that.tradingPairs[i].last = response[1][6].toFixed(2);
+                        that.tradingPairs[i].change = response[1][4].toFixed(2);
+                        that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
+                        that.tradingPairs[i].high = response[1][8].toFixed(2);
+                        that.tradingPairs[i].low = response[1][9].toFixed(2);
+                      }
+                    };
+                  };
 
-                ws.onmessage = function (msg) {
-                  var response = JSON.parse(msg.data);
-                  console.log(that.pairs[i], response);
-
-                  if (response[1] && response[1] != "hb") {
-                    that.tradingPairs[i].last = response[1][6].toFixed(2);
-                    that.tradingPairs[i].change = response[1][4].toFixed(2);
-                    that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
-                    that.tradingPairs[i].high = response[1][8].toFixed(2);
-                    that.tradingPairs[i].low = response[1][9].toFixed(2);
+                  for (var i = 0; i < that.pairs.length; i++) {
+                    _loop(i);
                   }
-                };
-              };
-
-              for (i = 0; i < that.pairs.length; i++) {
-                _loop(i);
+                })();
               }
 
-            case 13:
+            case 7:
             case "end":
               return _context.stop();
           }

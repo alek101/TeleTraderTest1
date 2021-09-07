@@ -39,7 +39,15 @@ export default {
          handlePercentage(num){
              num = num  *100;
              return num>0? '+'+num.toFixed(2)+'%':num.toFixed(2)+'%';
-         }
+         },
+        getTopFive(array) {
+        const array2 = array.slice(0,5);
+        const result = [];
+        for(let mem of array2){
+            result.push(mem.toUpperCase());
+        }
+        return result;
+        }
         },
         async beforeMount() {
             const res = await fetch('/api/getSymbols',{
@@ -51,51 +59,56 @@ export default {
                 mode: 'cors'
             })
                 const resr= await res.json();
-                this.pairs = await resr.slice(0,5);
+                
+
              if(resr.code) {
                 alert(resr.error_description);
             }
- 
-            // const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
-            const that = this;
-            for(let i=0; i<that.pairs.length; i++){
-                
-                let np = {
-                            name: that.pairs[i],
-                            last: null,
-                            change: null,
-                            changePercentage: null,
-                            high: null,
-                            low: null
-                            };
-                that.tradingPairs.push(np);
-               let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
-
-                ws.onopen = function(){
-                    ws.send(JSON.stringify({
-                         event: 'subscribe', 
-                        channel: 'ticker', 
-                        symbol: 'tBTCUSD' 
-                    }));
-        
-                }
-
-                ws.onmessage = function(msg){
-                        let response = JSON.parse(msg.data);
-                        console.log(that.pairs[i], response); 
-                        if(response[1] && response[1] != "hb")
-                        {
-                           
-                            that.tradingPairs[i].last = (response[1][6]).toFixed(2);
-                            that.tradingPairs[i].change = (response[1][4]).toFixed(2);
-                            that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
-                            that.tradingPairs[i].high = (response[1][8]).toFixed(2);
-                            that.tradingPairs[i].low = (response[1][9]).toFixed(2);
-                        }
+            else
+            {
+             this.pairs = this.getTopFive(resr);
+                    const that = this;
+                    for(let i=0; i<that.pairs.length; i++){
                         
+                        let np = {
+                                    name: that.pairs[i],
+                                    last: null,
+                                    change: null,
+                                    changePercentage: null,
+                                    high: null,
+                                    low: null
+                                    };
+                        that.tradingPairs.push(np);
+                    let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
+
+                        ws.onopen = function(){
+                            ws.send(JSON.stringify({
+                                event: 'subscribe', 
+                                channel: 'ticker', 
+                                symbol: 't'+that.pairs[i],
+                            }));
+                
+                        }
+
+                        ws.onmessage = function(msg){
+                                let response = JSON.parse(msg.data);
+                                console.log(that.pairs[i], response); 
+                                if(response[1] && response[1] != "hb")
+                                {
+                                
+                                    that.tradingPairs[i].last = (response[1][6]).toFixed(2);
+                                    that.tradingPairs[i].change = (response[1][4]).toFixed(2);
+                                    that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
+                                    that.tradingPairs[i].high = (response[1][8]).toFixed(2);
+                                    that.tradingPairs[i].low = (response[1][9]).toFixed(2);
+                                }
+                                
+                            }
                     }
+                } 
             }
-        } ,
+ 
+            
         
        
 }

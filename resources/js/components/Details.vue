@@ -68,12 +68,15 @@ export default {
         });
         const r2r = await r2.json();
         
-            this.lastPrice = r2r.last_price;
-            this.high = r2r.high;
-            this.low = r2r.low;   
+              
         
         if(r2r.code){
             alert(r2r.error_description);
+        }
+        else {
+            this.lastPrice = r2r.last_price;
+            this.high = r2r.high;
+            this.low = r2r.low; 
         }
         
     },
