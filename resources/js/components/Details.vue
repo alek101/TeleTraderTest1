@@ -59,7 +59,12 @@ export default {
                 this.isFavorite=true;
             } 
         const r2 = await fetch('https://api.bitfinex.com/v1/pubticker/'+this.pair, {
-            mode: 'no-cors'
+            method: 'GET',
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+                mode: 'cors'
         });
         const r2r = await r2.json();
         this.lastPrice = r2r.last_price;

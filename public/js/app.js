@@ -2179,7 +2179,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _context2.next = 11;
               return fetch('https://api.bitfinex.com/v1/pubticker/' + _this2.pair, {
-                mode: 'no-cors'
+                method: 'GET',
+                headers: {
+                  'Access-Control-Allow-Origin': '*',
+                  'Content-Type': 'application/json'
+                },
+                mode: 'cors'
               });
 
             case 11:
@@ -2399,13 +2404,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var pairs, _loop, i;
+      var res, resr, pairs, _loop, i;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              pairs = ["BTCUSD", "LTCUSD", "LTCBTC", "ETHUSD", "ETHBCD"];
+              _context.next = 2;
+              return fetch('/api/getSymbols', {
+                method: 'GET',
+                headers: {
+                  'Access-Control-Allow-Origin': '*',
+                  'Content-Type': 'application/json'
+                },
+                mode: 'cors'
+              });
+
+            case 2:
+              res = _context.sent;
+              console.log(res);
+              _context.next = 6;
+              return res.json();
+
+            case 6:
+              resr = _context.sent;
+              _context.next = 9;
+              return resr.slice(0, 5);
+
+            case 9:
+              pairs = _context.sent;
 
               _loop = function _loop(i) {
                 var np = {
@@ -2443,11 +2470,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 };
               };
 
+              // const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
               for (i = 0; i < pairs.length; i++) {
                 _loop(i);
               }
 
-            case 3:
+            case 12:
             case "end":
               return _context.stop();
           }

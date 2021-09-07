@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BitfinexController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CookieController;
@@ -24,3 +25,5 @@ Route::get('/login',[CookieController::class, 'login']);
 Route::get('/fav/{fav}',[CookieController::class, 'handleFavorites']);
 
 Route::get('/status',[CookieController::class, 'status']);
+
+Route::get('/getSymbols',[BitfinexController::class, 'getSymbols']);

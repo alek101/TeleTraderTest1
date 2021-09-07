@@ -39,7 +39,18 @@ export default {
          }
         },
         async beforeMount() {
-            const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
+            const res = await fetch('/api/getSymbols',{
+                method: 'GET',
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+                mode: 'cors'
+            })
+            console.log(res);
+            const resr= await res.json();
+            const pairs = await resr.slice(0,5);
+            // const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
             for(let i=0; i<pairs.length; i++){
                 
                 let np = {
