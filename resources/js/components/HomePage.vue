@@ -29,7 +29,10 @@ export default {
      data() {
             return {
                 tradingPairs: [
-                ],              
+                ],  
+                pairs: [
+
+                ]            
             }
         },
         methods: {
@@ -47,14 +50,18 @@ export default {
                 },
                 mode: 'cors'
             })
-            console.log(res);
-            const resr= await res.json();
-            const pairs = await resr.slice(0,5);
+                const resr= await res.json();
+                this.pairs = await resr.slice(0,5);
+             if(resr.code) {
+                alert(resr.error_description);
+            }
+ 
             // const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
-            for(let i=0; i<pairs.length; i++){
+            const that = this;
+            for(let i=0; i<that.pairs.length; i++){
                 
                 let np = {
-                            name: pairs[i],
+                            name: that.pairs[i],
                             last: null,
                             change: null,
                             changePercentage: null,
@@ -68,7 +75,7 @@ export default {
                     ws.send(JSON.stringify({
                         "event":"subscribe",
                         "channel":"ticker",
-                        "ticket":pairs[i]
+                        "ticket":that.pairs[i]
                     }));
         
                 }
@@ -77,10 +84,10 @@ export default {
                         let response = JSON.parse(msg.data);
                         if(response[1] && response[1] != "hb")
                         {
-                           console.log(pairs[i], response); 
+                           console.log(that.pairs[i], response); 
                             this.tradingPairs[i].lastPrice = (response[1][6]).toFixed(2);
                             this.tradingPairs[i].change = (response[1][4]).toFixed(2);
-                            this.tradingPairs[i].changePercentage = this.handlePercentage(response[1][5]);
+                            this.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
                             this.tradingPairs[i].high = (response[1][8]).toFixed(2);
                             this.tradingPairs[i].low = (response[1][9]).toFixed(2);
                         }

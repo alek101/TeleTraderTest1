@@ -2178,7 +2178,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
 
               _context2.next = 11;
-              return fetch('https://api.bitfinex.com/v1/pubticker/' + _this2.pair, {
+              return fetch('/api/getDetails/' + _this2.pair, {
                 method: 'GET',
                 headers: {
                   'Access-Control-Allow-Origin': '*',
@@ -2198,7 +2198,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _this2.high = r2r.high;
               _this2.low = r2r.low;
 
-            case 18:
+              if (r2r.code) {
+                alert(r2r.error_description);
+              }
+
+            case 19:
             case "end":
               return _context2.stop();
           }
@@ -2391,7 +2395,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   name: 'HomePage',
   data: function data() {
     return {
-      tradingPairs: []
+      tradingPairs: [],
+      pairs: []
     };
   },
   methods: {
@@ -2404,7 +2409,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var res, resr, pairs, _loop, i;
+      var res, resr, that, _loop, i;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
@@ -2422,21 +2427,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 2:
               res = _context.sent;
-              console.log(res);
-              _context.next = 6;
+              _context.next = 5;
               return res.json();
 
-            case 6:
+            case 5:
               resr = _context.sent;
-              _context.next = 9;
+              _context.next = 8;
               return resr.slice(0, 5);
 
-            case 9:
-              pairs = _context.sent;
+            case 8:
+              _this.pairs = _context.sent;
+
+              if (resr.code) {
+                alert(resr.error_description);
+              } // const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
+
+
+              that = _this;
 
               _loop = function _loop(i) {
                 var np = {
-                  name: pairs[i],
+                  name: that.pairs[i],
                   last: null,
                   change: null,
                   changePercentage: null,
@@ -2452,7 +2463,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   ws.send(JSON.stringify({
                     "event": "subscribe",
                     "channel": "ticker",
-                    "ticket": pairs[i]
+                    "ticket": that.pairs[i]
                   }));
                 };
 
@@ -2460,22 +2471,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   var response = JSON.parse(msg.data);
 
                   if (response[1] && response[1] != "hb") {
-                    console.log(pairs[i], response);
+                    console.log(that.pairs[i], response);
                     this.tradingPairs[i].lastPrice = response[1][6].toFixed(2);
                     this.tradingPairs[i].change = response[1][4].toFixed(2);
-                    this.tradingPairs[i].changePercentage = this.handlePercentage(response[1][5]);
+                    this.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
                     this.tradingPairs[i].high = response[1][8].toFixed(2);
                     this.tradingPairs[i].low = response[1][9].toFixed(2);
                   }
                 };
               };
 
-              // const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
-              for (i = 0; i < pairs.length; i++) {
+              for (i = 0; i < that.pairs.length; i++) {
                 _loop(i);
               }
 
-            case 12:
+            case 13:
             case "end":
               return _context.stop();
           }

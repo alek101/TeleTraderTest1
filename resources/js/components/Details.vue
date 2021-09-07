@@ -58,7 +58,7 @@ export default {
             if(this.favorites[this.pair]){
                 this.isFavorite=true;
             } 
-        const r2 = await fetch('https://api.bitfinex.com/v1/pubticker/'+this.pair, {
+        const r2 = await fetch('/api/getDetails/'+this.pair, {
             method: 'GET',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
@@ -67,9 +67,15 @@ export default {
                 mode: 'cors'
         });
         const r2r = await r2.json();
-        this.lastPrice = r2r.last_price;
-        this.high = r2r.high;
-        this.low = r2r.low;
+        
+            this.lastPrice = r2r.last_price;
+            this.high = r2r.high;
+            this.low = r2r.low;   
+        
+        if(r2r.code){
+            alert(r2r.error_description);
+        }
+        
     },
     
 }

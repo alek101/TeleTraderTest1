@@ -27,3 +27,5 @@ Route::get('/fav/{fav}',[CookieController::class, 'handleFavorites']);
 Route::get('/status',[CookieController::class, 'status']);
 
 Route::get('/getSymbols',[BitfinexController::class, 'getSymbols']);
+
+Route::get('/getDetails/{pair}',[BitfinexController::class, 'getDetails']);
