@@ -66,17 +66,18 @@ export default {
                 },
                 mode: 'cors'
         });
+        console.log('r2',r2);
         const r2r = await r2.json();
-        
+        console.log('r2r',r2r, typeof(r2r));
               
         
         if(r2r.code){
             alert(r2r.error_description);
         }
         else {
-            this.lastPrice = r2r.last_price;
-            this.high = r2r.high;
-            this.low = r2r.low; 
+            this.pairInfo.lastPrice = r2r.last_price;
+            this.pairInfo.high = r2r.high;
+            this.pairInfo.low = r2r.low; 
         }
         
     },

@@ -70,7 +70,7 @@ export default {
                     ws.send(JSON.stringify({
                          event: 'subscribe', 
                         channel: 'ticker', 
-                        symbol: 'tBTCUSD' 
+                        symbol: 't'+that.pairs[i], 
                     }));
         
                 }

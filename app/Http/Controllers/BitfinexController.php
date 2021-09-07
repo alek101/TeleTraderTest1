@@ -13,7 +13,7 @@ class BitfinexController extends Controller
     }
 
     public function getDetails($pair){
-        $response = Http::get('https://api.bitfinex.com/v1/symbols/'.$pair);
+        $response = Http::get('https://api.bitfinex.com/v1/pubticker/'.$pair);
         return $response;
     }
 }

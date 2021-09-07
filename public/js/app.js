@@ -2078,6 +2078,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -2189,21 +2191,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 11:
               r2 = _context2.sent;
-              _context2.next = 14;
+              console.log('r2', r2);
+              _context2.next = 15;
               return r2.json();
 
-            case 14:
+            case 15:
               r2r = _context2.sent;
+              console.log('r2r', r2r, _typeof(r2r));
 
               if (r2r.code) {
                 alert(r2r.error_description);
               } else {
-                _this2.lastPrice = r2r.last_price;
-                _this2.high = r2r.high;
-                _this2.low = r2r.low;
+                _this2.pairInfo.lastPrice = r2r.last_price;
+                _this2.pairInfo.high = r2r.high;
+                _this2.pairInfo.low = r2r.low;
               }
 
-            case 16:
+            case 18:
             case "end":
               return _context2.stop();
           }
@@ -2318,7 +2322,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       ws.send(JSON.stringify({
                         event: 'subscribe',
                         channel: 'ticker',
-                        symbol: 'tBTCUSD'
+                        symbol: 't' + that.pairs[i]
                       }));
                     };
 
