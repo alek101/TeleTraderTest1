@@ -2426,18 +2426,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              // const pairs = await fetch('https://api-pub.bitfinex.com/v1/symbols',{
+              _this.tradingPairs.forEach(function (pair) {
+                return pair.changePercentage = _this.handlePercentage(pair.change, pair.last);
+              }); // const pairs = await fetch('https://api.bitfinex.com/v1/symbols',{
               //     mode: 'no-cors',
               // });
+              // console.log('res',pairs);
               // const pairsData = await pairs.json();
+              // console.log('pd',pairsData);
               // for (let i=0; i<5; i++){
               //     const newTradingPair = {pair: pairsData[i]};
               //     console.log(newTradingPair)
               //     this.tradingPairs.push(newTradingPair);
               // }
-              _this.tradingPairs.forEach(function (pair) {
-                return pair.changePercentage = _this.handlePercentage(pair.change, pair.last);
-              });
+
 
             case 1:
             case "end":
@@ -2517,7 +2519,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this2 = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-      var res, data, pairs, pairsData, i, newTradingPair;
+      var res, data;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -2534,29 +2536,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               data = _context2.sent;
               _this2.isLoged = data.isLoged;
               _this2.favorites = data.favorites;
-              _context2.next = 10;
-              return fetch('https://api-pub.bitfinex.com/v1/symbols', {
-                mode: 'no-cors'
-              });
 
-            case 10:
-              pairs = _context2.sent;
-              _context2.next = 13;
-              return pairs.json();
-
-            case 13:
-              pairsData = _context2.sent;
-
-              for (i = 0; i < 5; i++) {
-                newTradingPair = {
-                  pair: pairsData[i]
-                };
-                console.log(newTradingPair);
-
-                _this2.tradingPairs.push(newTradingPair);
-              }
-
-            case 15:
+            case 8:
             case "end":
               return _context2.stop();
           }

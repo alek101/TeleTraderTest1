@@ -75,17 +75,18 @@ export default {
          }
         },
         async beforeMount() {
-            // const pairs = await fetch('https://api-pub.bitfinex.com/v1/symbols',{
+            this.tradingPairs.forEach(pair=>pair.changePercentage=this.handlePercentage(pair.change, pair.last));
+            // const pairs = await fetch('https://api.bitfinex.com/v1/symbols',{
             //     mode: 'no-cors',
             // });
+            // console.log('res',pairs);
             // const pairsData = await pairs.json();
+            // console.log('pd',pairsData);
             // for (let i=0; i<5; i++){
             //     const newTradingPair = {pair: pairsData[i]};
             //     console.log(newTradingPair)
             //     this.tradingPairs.push(newTradingPair);
             // }
-            this.tradingPairs.forEach(pair=>pair.changePercentage=this.handlePercentage(pair.change, pair.last));
-
         } ,
 
 }

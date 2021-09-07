@@ -30,16 +30,6 @@
             const data = await res.json();
             this.isLoged=data.isLoged;
             this.favorites=data.favorites;
-            const pairs = await fetch('https://api-pub.bitfinex.com/v1/symbols',{
-                mode: 'no-cors',
-            });
-            const pairsData = await pairs.json();
-            for (let i=0; i<5; i++){
-                const newTradingPair = {pair: pairsData[i]};
-                console.log(newTradingPair)
-                this.tradingPairs.push(newTradingPair);
-            }
-
         }   
     }
 </script>
