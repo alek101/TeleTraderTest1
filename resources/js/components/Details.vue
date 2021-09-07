@@ -7,7 +7,6 @@
             <div class="entry">Last Price</div>
             <div class="entry">High</div>
             <div class="entry">Low</div>
-            
         </div>
         <div class="tableLine2">
             <div class="entry">{{pair}}</div>
@@ -58,30 +57,17 @@ export default {
             if(this.favorites[this.pair]){
                 this.isFavorite=true;
             } 
-        const r2 = await fetch('/api/getDetails/'+this.pair, {
-            method: 'GET',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json',
-                },
-                mode: 'cors'
-        });
-        console.log('r2',r2);
+        const r2 = await fetch('/api/getDetails/'+this.pair);
         const r2r = await r2.json();
-        console.log('r2r',r2r, typeof(r2r));
-              
-        
         if(r2r.code){
             alert(r2r.error_description);
         }
         else {
-            this.pairInfo.lastPrice = r2r.last_price;
-            this.pairInfo.high = r2r.high;
-            this.pairInfo.low = r2r.low; 
+            this.pairInfo.lastPrice = (r2r.last_price).toFixed(2);
+            this.pairInfo.high = (r2r.high).toFixed(2);
+            this.pairInfo.low = (r2r.low).toFixed(2); 
         }
-        
     },
-    
 }
 </script>
 
@@ -97,23 +83,18 @@ export default {
         grid-template-columns: 600px 200px 200px 200px;
         border-bottom: 1px solid gray;  
     }
-
     .removeButton {
         background-color: red;
         color: white;
     }
-
     .addButton {
         background-color: green;
-        color: white;
-        
+        color: white;   
     }
-
     .addButton,.removeButton {
         height: 30px;
         margin-top: 10px;
     }
-
     .addButton:hover,.removeButton:hover {
         cursor: pointer;
     }

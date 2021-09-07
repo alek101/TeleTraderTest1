@@ -47,17 +47,8 @@ export default {
     }
     },
     async beforeMount() {
-        const res = await fetch('/api/getSymbols',{
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-            mode: 'cors'
-        })
+        const res = await fetch('/api/getSymbols')
             const resr= await res.json();
-            
-
             if(resr.code) {
             alert(resr.error_description);
         }

@@ -5,7 +5,6 @@
                 <router-link to="/">Home</router-link>
                 <router-link to="/favorites" v-if="isLoged">Favorites</router-link>  
             </div>
-            
             <button @click="logIn" v-if="!isLoged" class="login">Login</button></div>
         <router-view></router-view>
     </div>
@@ -45,9 +44,7 @@
         font-weight: bold;
         padding: 10px;
         margin-bottom: 10px;
-        
     }
-
     .login {
         width: 148px;
         height: 38px;
@@ -55,7 +52,6 @@
         color: white;
         border: 1px solid rgb(63, 216, 178);
     }
-
     .login:hover {
         color: rgb(63, 216, 178);
         background-color: white;

@@ -2078,15 +2078,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-//
 //
 //
 //
@@ -2180,34 +2177,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
 
               _context2.next = 11;
-              return fetch('/api/getDetails/' + _this2.pair, {
-                method: 'GET',
-                headers: {
-                  'Access-Control-Allow-Origin': '*',
-                  'Content-Type': 'application/json'
-                },
-                mode: 'cors'
-              });
+              return fetch('/api/getDetails/' + _this2.pair);
 
             case 11:
               r2 = _context2.sent;
-              console.log('r2', r2);
-              _context2.next = 15;
+              _context2.next = 14;
               return r2.json();
 
-            case 15:
+            case 14:
               r2r = _context2.sent;
-              console.log('r2r', r2r, _typeof(r2r));
 
               if (r2r.code) {
                 alert(r2r.error_description);
               } else {
-                _this2.pairInfo.lastPrice = r2r.last_price;
-                _this2.pairInfo.high = r2r.high;
-                _this2.pairInfo.low = r2r.low;
+                _this2.pairInfo.lastPrice = r2r.last_price.toFixed(2);
+                _this2.pairInfo.high = r2r.high.toFixed(2);
+                _this2.pairInfo.low = r2r.low.toFixed(2);
               }
 
-            case 18:
+            case 16:
             case "end":
               return _context2.stop();
           }
@@ -2452,14 +2440,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return fetch('/api/getSymbols', {
-                method: 'GET',
-                headers: {
-                  'Access-Control-Allow-Origin': '*',
-                  'Content-Type': 'application/json'
-                },
-                mode: 'cors'
-              });
+              return fetch('/api/getSymbols');
 
             case 2:
               res = _context.sent;
@@ -2547,7 +2528,6 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-//
 //
 //
 //
