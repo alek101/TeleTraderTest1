@@ -47,7 +47,7 @@ export default {
         else {
             this.isLoged=resr.isLoged;
         this.favorites=resr.favorites;
-        this.pairs = Object.keys(this.favorites);
+        this.pairs = Object.keys(this.favorites).sort((a,b)=>a.localeCompare(b));
         const that=this;
             for(let i=0; i<that.pairs.length; i++){
             
@@ -71,8 +71,7 @@ export default {
             }
 
             ws.onmessage = function(msg){
-                    let response = JSON.parse(msg.data);
-                    console.log(that.pairs[i], response); 
+                    let response = JSON.parse(msg.data); 
                     if(response[1] && response[1] != "hb")
                     {
                         that.tradingPairs[i].last = (response[1][6]).toFixed(2);

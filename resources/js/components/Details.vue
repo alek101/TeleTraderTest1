@@ -45,7 +45,15 @@ export default {
     ],
     methods: {
         async toggleFavorites(){
-            await fetch('/api/fav/'+this.pair);
+            await fetch('/api/fav',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fav: this.pair,
+                    })
+                });
             this.isFavorite=!this.isFavorite;
         }
     },
@@ -63,9 +71,9 @@ export default {
             alert(r2r.error_description);
         }
         else {
-            this.pairInfo.lastPrice = (r2r.last_price).toFixed(2);
-            this.pairInfo.high = (r2r.high).toFixed(2);
-            this.pairInfo.low = (r2r.low).toFixed(2); 
+            this.pairInfo.lastPrice = Number(r2r.last_price).toFixed(2);
+            this.pairInfo.high = Number(r2r.high).toFixed(2);
+            this.pairInfo.low = Number(r2r.low).toFixed(2); 
         }
     },
 }

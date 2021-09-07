@@ -9,14 +9,16 @@ use Illuminate\Support\Facades\Cookie;
 class CookieController extends Controller
 {
     // https://www.nicesnippets.com/blog/laravel-cookies-set-get-delete-cookies
-    public function login()
+    public function login(Request $request)
     {
+        $login = $request->login;
         $response = new  Response('');
-        return $response->withCookie(cookie()->forever('logedIn', true));
+        return $response->withCookie(cookie()->forever('logedIn', $login));
     }
 
-    public function handleFavorites($fav)
+    public function handleFavorites(Request $request)
     {
+        $fav=$request->fav;
         $isLoged=Cookie::get('logedIn');
         if($isLoged)
         {

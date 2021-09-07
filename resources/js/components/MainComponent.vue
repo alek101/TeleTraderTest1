@@ -22,7 +22,15 @@
         },
         methods: {
             async logIn(){
-                await fetch('/api/login');
+                await fetch('/api/login',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        login: true,
+                    })
+                });
                 this.isLoged = true;
             }
         },

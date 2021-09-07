@@ -20,9 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/login',[CookieController::class, 'login']);
+Route::post('/login',[CookieController::class, 'login']);
 
-Route::get('/fav/{fav}',[CookieController::class, 'handleFavorites']);
+Route::post('/fav',[CookieController::class, 'handleFavorites']);
 
 Route::get('/status',[CookieController::class, 'status']);
 

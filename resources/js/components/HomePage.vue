@@ -75,12 +75,10 @@ export default {
                         channel: 'ticker', 
                         symbol: 't'+that.pairs[i],
                     }));
-        
                 }
 
                 ws.onmessage = function(msg){
                         let response = JSON.parse(msg.data);
-                        console.log(that.pairs[i], response); 
                         if(response[1] && response[1] != "hb")
                         {
                         that.tradingPairs[i].last = (response[1][6]).toFixed(2);

@@ -2136,7 +2136,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return fetch('/api/fav/' + _this.pair);
+                return fetch('/api/fav', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    fav: _this.pair
+                  })
+                });
 
               case 2:
                 _this.isFavorite = !_this.isFavorite;
@@ -2190,9 +2198,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               if (r2r.code) {
                 alert(r2r.error_description);
               } else {
-                _this2.pairInfo.lastPrice = r2r.last_price.toFixed(2);
-                _this2.pairInfo.high = r2r.high.toFixed(2);
-                _this2.pairInfo.low = r2r.low.toFixed(2);
+                _this2.pairInfo.lastPrice = Number(r2r.last_price).toFixed(2);
+                _this2.pairInfo.high = Number(r2r.high).toFixed(2);
+                _this2.pairInfo.low = Number(r2r.low).toFixed(2);
               }
 
             case 16:
@@ -2291,7 +2299,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 (function () {
                   _this.isLoged = resr.isLoged;
                   _this.favorites = resr.favorites;
-                  _this.pairs = Object.keys(_this.favorites);
+                  _this.pairs = Object.keys(_this.favorites).sort(function (a, b) {
+                    return a.localeCompare(b);
+                  });
                   var that = _this;
 
                   var _loop = function _loop(i) {
@@ -2316,7 +2326,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                     ws.onmessage = function (msg) {
                       var response = JSON.parse(msg.data);
-                      console.log(that.pairs[i], response);
 
                       if (response[1] && response[1] != "hb") {
                         that.tradingPairs[i].last = response[1][6].toFixed(2);
@@ -2479,7 +2488,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
                     ws.onmessage = function (msg) {
                       var response = JSON.parse(msg.data);
-                      console.log(that.pairs[i], response);
 
                       if (response[1] && response[1] != "hb") {
                         that.tradingPairs[i].last = response[1][6].toFixed(2);
@@ -2559,7 +2567,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return fetch('/api/login');
+                return fetch('/api/login', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    login: true
+                  })
+                });
 
               case 2:
                 _this.isLoged = true;
