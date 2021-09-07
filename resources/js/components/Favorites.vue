@@ -30,7 +30,8 @@ export default {
                    
                 ],
             isLoged: false,
-            favorites: {},      
+            favorites: {}, 
+            pairs: [],     
         }
     },
     
@@ -46,39 +47,41 @@ export default {
             const data = await res.json();
             this.isLoged=data.isLoged;
             this.favorites=data.favorites;
-            const pairs = Object.keys(this.favorites);
-             for(let i=0; i<pairs.length; i++){
+            this.pairs = Object.keys(this.favorites);
+            const that=this;
+             for(let i=0; i<that.pairs.length; i++){
                 
                 let np = {
-                            name: pairs[i],
+                            name: that.pairs[i],
                             last: null,
                             change: null,
                             changePercentage: null,
                             high: null,
                             low: null
                             };
-                this.tradingPairs.push(np);
+                that.tradingPairs.push(np);
                let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
                 ws.onopen = function(){
                     ws.send(JSON.stringify({
-                        "event":"subscribe",
-                        "channel":"ticker",
-                        "ticket":pairs[i]
+                         event: 'subscribe', 
+                        channel: 'ticker', 
+                        symbol: 'tBTCUSD' 
                     }));
         
                 }
 
                 ws.onmessage = function(msg){
                         let response = JSON.parse(msg.data);
+                        console.log(that.pairs[i], response); 
                         if(response[1] && response[1] != "hb")
                         {
-                           console.log(pairs[i], response); 
-                            this.tradingPairs[i].lastPrice = (response[1][6]).toFixed(2);
-                            this.tradingPairs[i].change = (response[1][4]).toFixed(2);
-                            this.tradingPairs[i].changePercentage = this.handlePercentage(response[1][5]);
-                            this.tradingPairs[i].high = (response[1][8]).toFixed(2);
-                            this.tradingPairs[i].low = (response[1][9]).toFixed(2);
+                           
+                            that.tradingPairs[i].last = (response[1][6]).toFixed(2);
+                            that.tradingPairs[i].change = (response[1][4]).toFixed(2);
+                            that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
+                            that.tradingPairs[i].high = (response[1][8]).toFixed(2);
+                            that.tradingPairs[i].low = (response[1][9]).toFixed(2);
                         }
                         
                     }

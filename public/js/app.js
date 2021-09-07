@@ -2262,7 +2262,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       tradingPairs: [],
       isLoged: false,
-      favorites: {}
+      favorites: {},
+      pairs: []
     };
   },
   methods: {
@@ -2275,7 +2276,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var res, data, pairs, _loop, i;
+      var res, data, that, _loop, i;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
@@ -2293,49 +2294,48 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               data = _context.sent;
               _this.isLoged = data.isLoged;
               _this.favorites = data.favorites;
-              pairs = Object.keys(_this.favorites);
+              _this.pairs = Object.keys(_this.favorites);
+              that = _this;
 
               _loop = function _loop(i) {
                 var np = {
-                  name: pairs[i],
+                  name: that.pairs[i],
                   last: null,
                   change: null,
                   changePercentage: null,
                   high: null,
                   low: null
                 };
-
-                _this.tradingPairs.push(np);
-
+                that.tradingPairs.push(np);
                 var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
                 ws.onopen = function () {
                   ws.send(JSON.stringify({
-                    "event": "subscribe",
-                    "channel": "ticker",
-                    "ticket": pairs[i]
+                    event: 'subscribe',
+                    channel: 'ticker',
+                    symbol: 'tBTCUSD'
                   }));
                 };
 
                 ws.onmessage = function (msg) {
                   var response = JSON.parse(msg.data);
+                  console.log(that.pairs[i], response);
 
                   if (response[1] && response[1] != "hb") {
-                    console.log(pairs[i], response);
-                    this.tradingPairs[i].lastPrice = response[1][6].toFixed(2);
-                    this.tradingPairs[i].change = response[1][4].toFixed(2);
-                    this.tradingPairs[i].changePercentage = this.handlePercentage(response[1][5]);
-                    this.tradingPairs[i].high = response[1][8].toFixed(2);
-                    this.tradingPairs[i].low = response[1][9].toFixed(2);
+                    that.tradingPairs[i].last = response[1][6].toFixed(2);
+                    that.tradingPairs[i].change = response[1][4].toFixed(2);
+                    that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
+                    that.tradingPairs[i].high = response[1][8].toFixed(2);
+                    that.tradingPairs[i].low = response[1][9].toFixed(2);
                   }
                 };
               };
 
-              for (i = 0; i < pairs.length; i++) {
+              for (i = 0; i < that.pairs.length; i++) {
                 _loop(i);
               }
 
-            case 11:
+            case 12:
             case "end":
               return _context.stop();
           }
@@ -2454,29 +2454,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   high: null,
                   low: null
                 };
-
-                _this.tradingPairs.push(np);
-
+                that.tradingPairs.push(np);
                 var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
                 ws.onopen = function () {
                   ws.send(JSON.stringify({
-                    "event": "subscribe",
-                    "channel": "ticker",
-                    "ticket": that.pairs[i]
+                    event: 'subscribe',
+                    channel: 'ticker',
+                    symbol: 'tBTCUSD'
                   }));
                 };
 
                 ws.onmessage = function (msg) {
                   var response = JSON.parse(msg.data);
+                  console.log(that.pairs[i], response);
 
                   if (response[1] && response[1] != "hb") {
-                    console.log(that.pairs[i], response);
-                    this.tradingPairs[i].lastPrice = response[1][6].toFixed(2);
-                    this.tradingPairs[i].change = response[1][4].toFixed(2);
-                    this.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
-                    this.tradingPairs[i].high = response[1][8].toFixed(2);
-                    this.tradingPairs[i].low = response[1][9].toFixed(2);
+                    that.tradingPairs[i].last = response[1][6].toFixed(2);
+                    that.tradingPairs[i].change = response[1][4].toFixed(2);
+                    that.tradingPairs[i].changePercentage = that.handlePercentage(response[1][5]);
+                    that.tradingPairs[i].high = response[1][8].toFixed(2);
+                    that.tradingPairs[i].low = response[1][9].toFixed(2);
                   }
                 };
               };
