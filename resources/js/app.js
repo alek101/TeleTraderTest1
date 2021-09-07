@@ -20,6 +20,7 @@ window.Vue = require('vue').default;
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('main-component', require('./components/MainComponent.vue').default);
+import router from './router'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -28,6 +29,6 @@ Vue.component('main-component', require('./components/MainComponent.vue').defaul
  */
 
 const app = new Vue({
+    router,
     el: '#app',
-    components: ['example-component'],
 });
