@@ -76,19 +76,31 @@ export default {
         },
         async beforeMount() {
             this.tradingPairs.forEach(pair=>pair.changePercentage=this.handlePercentage(pair.change, pair.last));
-            // const pairs = await fetch('https://api.bitfinex.com/v1/symbols',{
-            //     mode: 'no-cors',
-            // });
-            // console.log('res',pairs);
-            // const pairsData = await pairs.json();
-            // console.log('pd',pairsData);
-            // for (let i=0; i<5; i++){
-            //     const newTradingPair = {pair: pairsData[i]};
-            //     console.log(newTradingPair)
-            //     this.tradingPairs.push(newTradingPair);
-            // }
-        } ,
+            const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
+            for(let i=0; i<pairs.length; i++){
+               let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
+                ws.onopen = function(){
+                    ws.send(JSON.stringify({
+                        "event":"subscribe",
+                        "channel":"ticker",
+                        "ticket":pairs[i]
+                    }));
+        
+                }
+
+                ws.onmessage = function(msg){
+                        let response = JSON.parse(msg.data);
+                        if(response[1] != "hb")
+                        {
+                           console.log(pairs[i], response); 
+                        }
+                        
+                    }
+            }
+        } ,
+        
+       
 }
 </script>
 

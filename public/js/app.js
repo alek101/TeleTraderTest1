@@ -2422,26 +2422,43 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+      var pairs, _loop, i;
+
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _this.tradingPairs.forEach(function (pair) {
                 return pair.changePercentage = _this.handlePercentage(pair.change, pair.last);
-              }); // const pairs = await fetch('https://api.bitfinex.com/v1/symbols',{
-              //     mode: 'no-cors',
-              // });
-              // console.log('res',pairs);
-              // const pairsData = await pairs.json();
-              // console.log('pd',pairsData);
-              // for (let i=0; i<5; i++){
-              //     const newTradingPair = {pair: pairsData[i]};
-              //     console.log(newTradingPair)
-              //     this.tradingPairs.push(newTradingPair);
-              // }
+              });
 
+              pairs = ["BTCUSD", "LTCUSD", "LTCBTC", "ETHUSD", "ETHBCD"];
 
-            case 1:
+              _loop = function _loop(i) {
+                var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
+
+                ws.onopen = function () {
+                  ws.send(JSON.stringify({
+                    "event": "subscribe",
+                    "channel": "ticker",
+                    "ticket": pairs[i]
+                  }));
+                };
+
+                ws.onmessage = function (msg) {
+                  var response = JSON.parse(msg.data);
+
+                  if (response[1] != "hb") {
+                    console.log(pairs[i], response);
+                  }
+                };
+              };
+
+              for (i = 0; i < pairs.length; i++) {
+                _loop(i);
+              }
+
+            case 4:
             case "end":
               return _context.stop();
           }
