@@ -1,8 +1,7 @@
 <template>
 <div>
-    <h1>Home page</h1>
     <div class="table1">
-        <div class="tableLine1">
+        <div class="tableLine1 headerTable">
             <div class="entry">Name</div>
             <div class="entry">Last</div>
             <div class="entry">Change</div>
@@ -11,12 +10,12 @@
             <div class="entry">Low</div>
         </div>
         <div class="tableLine1" v-for="pair in tradingPairs" :key="pair.name">
-            <router-link v-bind:to="'/details/'+pair.name">{{pair.name}}</router-link>
-            <div class="entry">{{pair.last.toFixed(2)}}</div>
-            <div class="entry">{{pair.change.toFixed(2)}}</div>
+            <div class="entry symbolLink"><router-link v-bind:to="'/details/'+pair.name">{{pair.name}}</router-link></div>
+            <div class="entry">{{pair.last}}</div>
+            <div class="entry">{{pair.change}}</div>
             <div class="entry">{{pair.changePercentage}}</div>
-            <div class="entry">{{pair.high.toFixed(2)}}</div>
-            <div class="entry">{{pair.low.toFixed(2)}}</div>
+            <div class="entry">{{pair.high}}</div>
+            <div class="entry">{{pair.low}}</div>
         </div>
     </div>
 </div>
@@ -30,54 +29,28 @@ export default {
      data() {
             return {
                 tradingPairs: [
-                    {
-                        name: 'BTCUSD',
-                        last: 32877,
-                        change: 1488,
-                        high:33639,
-                        low: 30968
-                    },
-                    {
-                        name: 'ETHUSD',
-                        last: 1825.6,
-                        change: 54.1,
-                        high:1904,
-                        low: 1753
-                    },
-                    {
-                        name: 'LTCUSD',
-                        last: 126.32,
-                        change: 4.08,
-                        high:130.52,
-                        low: 121
-                    },
-                    {
-                        name: 'LTCBTC',
-                        last: 0.0038322,
-                        change: -0.0000698,
-                        high: 0.0039407,
-                        low: 0.0038195
-                    },
-                    {
-                        name: 'ETHBTC',
-                        last: 0.055492,
-                        change: -0.0000698,
-                        high: 0.0038195,
-                        low: 0.055218
-                    }
                 ],              
             }
         },
         methods: {
-         handlePercentage(change,last){
-             const num = (change+last)/last*100-100;
+         handlePercentage(num){
+             num = num  *100;
              return num>0? '+'+num.toFixed(2)+'%':num.toFixed(2)+'%';
          }
         },
         async beforeMount() {
-            this.tradingPairs.forEach(pair=>pair.changePercentage=this.handlePercentage(pair.change, pair.last));
             const pairs = ["BTCUSD","LTCUSD","LTCBTC","ETHUSD","ETHBCD"];
             for(let i=0; i<pairs.length; i++){
+                
+                let np = {
+                            name: pairs[i],
+                            last: null,
+                            change: null,
+                            changePercentage: null,
+                            high: null,
+                            low: null
+                            };
+                this.tradingPairs.push(np);
                let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
                 ws.onopen = function(){
@@ -91,9 +64,14 @@ export default {
 
                 ws.onmessage = function(msg){
                         let response = JSON.parse(msg.data);
-                        if(response[1] != "hb")
+                        if(response[1] && response[1] != "hb")
                         {
                            console.log(pairs[i], response); 
+                            this.tradingPairs[i].lastPrice = (response[1][6]).toFixed(2);
+                            this.tradingPairs[i].change = (response[1][4]).toFixed(2);
+                            this.tradingPairs[i].changePercentage = this.handlePercentage(response[1][5]);
+                            this.tradingPairs[i].high = (response[1][8]).toFixed(2);
+                            this.tradingPairs[i].low = (response[1][9]).toFixed(2);
                         }
                         
                     }
@@ -105,13 +83,25 @@ export default {
 </script>
 
 <style>
+    .table1 {
+        border: 1px solid black;
+        border-radius: 3px;
+        box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.452);
+        padding: 25px;
+    }
     .tableLine1 {
         display: grid;
         grid-template-columns: repeat(6, 200px);
-        
-        border: 1px solid black;
+        border-bottom: 1px solid gray;    
     }
     .entry {
         justify-content: center;
+    }
+    .headerTable {
+        font-weight: bold;
+    }
+    .symbolLink {
+        color: rgb(63, 216, 178);
+        font-weight: bold;
     }
 </style>

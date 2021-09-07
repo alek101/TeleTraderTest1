@@ -1,9 +1,8 @@
 <template>
 <div>
     <div>
-    <h1>Details</h1>
     <div class="table2">
-        <div class="tableLine2">
+        <div class="tableLine2 headerTable">
             <div class="entry">Symbol</div>
             <div class="entry">Last Price</div>
             <div class="entry">High</div>
@@ -19,7 +18,7 @@
     </div>
     <div v-if="isLoged">
         <button @click="toggleFavorites" v-if="isFavorite" class='removeButton'>Remove from favorites</button>
-        <button @click="toggleFavorites" v-else class='addButton'>Add to favorite</button>  
+        <button @click="toggleFavorites" v-else class='addButton'>Add to favorites</button>  
     </div>
     
     </div>
@@ -33,10 +32,9 @@ export default {
     data(){
         return {
             pairInfo: {
-                symbol: '',
-                lastPrice: 0,
-                high: 0,
-                low: 0,
+                lastPrice: null,
+                high: null,
+                low: null,
             },
             isLoged: false,
             favorites: {},
@@ -60,17 +58,29 @@ export default {
             if(this.favorites[this.pair]){
                 this.isFavorite=true;
             } 
+        const r2 = await fetch('https://api.bitfinex.com/v1/pubticker/'+this.pair, {
+            mode: 'no-cors'
+        });
+        const r2r = await r2.json();
+        this.lastPrice = r2r.last_price;
+        this.high = r2r.high;
+        this.low = r2r.low;
     },
     
 }
 </script>
 
 <style >
+    .table2 {
+        border: 1px solid black;
+        border-radius: 3px;
+        box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.452);
+        padding: 5px;
+    }
     .tableLine2 {
         display: grid;
         grid-template-columns: 600px 200px 200px 200px;
-        
-        border: 1px solid black;
+        border-bottom: 1px solid gray;  
     }
 
     .removeButton {
@@ -81,5 +91,15 @@ export default {
     .addButton {
         background-color: green;
         color: white;
+        
+    }
+
+    .addButton,.removeButton {
+        height: 30px;
+        margin-top: 10px;
+    }
+
+    .addButton:hover,.removeButton:hover {
+        cursor: pointer;
     }
 </style>

@@ -2112,16 +2112,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'Details',
   data: function data() {
     return {
       pairInfo: {
-        symbol: '',
-        lastPrice: 0,
-        high: 0,
-        low: 0
+        lastPrice: null,
+        high: null,
+        low: null
       },
       isLoged: false,
       favorites: {},
@@ -2157,7 +2155,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this2 = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-      var res, data;
+      var res, data, r2, r2r;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -2179,7 +2177,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this2.isFavorite = true;
               }
 
-            case 9:
+              _context2.next = 11;
+              return fetch('https://api.bitfinex.com/v1/pubticker/' + _this2.pair, {
+                mode: 'no-cors'
+              });
+
+            case 11:
+              r2 = _context2.sent;
+              _context2.next = 14;
+              return r2.json();
+
+            case 14:
+              r2r = _context2.sent;
+              _this2.lastPrice = r2r.last_price;
+              _this2.high = r2r.high;
+              _this2.low = r2r.low;
+
+            case 18:
             case "end":
               return _context2.stop();
           }
@@ -2233,50 +2247,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'Favorites',
   data: function data() {
     return {
-      tradingPairs: [{
-        name: 'BTCUSD',
-        last: 32877,
-        change: 1488,
-        high: 33639,
-        low: 30968
-      }, {
-        name: 'ETHUSD',
-        last: 1825.6,
-        change: 54.1,
-        high: 1904,
-        low: 1753
-      }, {
-        name: 'LTCUSD',
-        last: 126.32,
-        change: 4.08,
-        high: 130.52,
-        low: 121
-      }, {
-        name: 'LTCBTC',
-        last: 0.0038322,
-        change: -0.0000698,
-        high: 0.0039407,
-        low: 0.0038195
-      }, {
-        name: 'ETHBTC',
-        last: 0.055492,
-        change: -0.0000698,
-        high: 0.0038195,
-        low: 0.055218
-      }],
-      filteredPairs: [],
+      tradingPairs: [],
       isLoged: false,
       favorites: {}
     };
   },
   methods: {
-    handlePercentage: function handlePercentage(change, last) {
-      var num = (change + last) / last * 100 - 100;
+    handlePercentage: function handlePercentage(num) {
+      num = num * 100;
       return num > 0 ? '+' + num.toFixed(2) + '%' : num.toFixed(2) + '%';
     }
   },
@@ -2284,41 +2266,67 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var res, data;
+      var res, data, pairs, _loop, i;
+
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              // const pairs = await fetch('https://api-pub.bitfinex.com/v1/symbols',{
-              //     mode: 'no-cors',
-              // });
-              // const pairsData = await pairs.json();
-              // for (let i=0; i<5; i++){
-              //     const newTradingPair = {pair: pairsData[i]};
-              //     console.log(newTradingPair)
-              //     this.tradingPairs.push(newTradingPair);
-              // }
-              _this.tradingPairs.forEach(function (pair) {
-                return pair.changePercentage = _this.handlePercentage(pair.change, pair.last);
-              });
-
-              _context.next = 3;
+              _context.next = 2;
               return fetch('/api/status');
 
-            case 3:
+            case 2:
               res = _context.sent;
-              _context.next = 6;
+              _context.next = 5;
               return res.json();
 
-            case 6:
+            case 5:
               data = _context.sent;
               _this.isLoged = data.isLoged;
               _this.favorites = data.favorites;
-              _this.filteredPairs = _this.tradingPairs.filter(function (pair) {
-                return _this.favorites[pair.name];
-              });
+              pairs = Object.keys(_this.favorites);
 
-            case 10:
+              _loop = function _loop(i) {
+                var np = {
+                  name: pairs[i],
+                  last: null,
+                  change: null,
+                  changePercentage: null,
+                  high: null,
+                  low: null
+                };
+
+                _this.tradingPairs.push(np);
+
+                var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
+
+                ws.onopen = function () {
+                  ws.send(JSON.stringify({
+                    "event": "subscribe",
+                    "channel": "ticker",
+                    "ticket": pairs[i]
+                  }));
+                };
+
+                ws.onmessage = function (msg) {
+                  var response = JSON.parse(msg.data);
+
+                  if (response[1] && response[1] != "hb") {
+                    console.log(pairs[i], response);
+                    this.tradingPairs[i].lastPrice = response[1][6].toFixed(2);
+                    this.tradingPairs[i].change = response[1][4].toFixed(2);
+                    this.tradingPairs[i].changePercentage = this.handlePercentage(response[1][5]);
+                    this.tradingPairs[i].high = response[1][8].toFixed(2);
+                    this.tradingPairs[i].low = response[1][9].toFixed(2);
+                  }
+                };
+              };
+
+              for (i = 0; i < pairs.length; i++) {
+                _loop(i);
+              }
+
+            case 11:
             case "end":
               return _context.stop();
           }
@@ -2374,47 +2382,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'HomePage',
   data: function data() {
     return {
-      tradingPairs: [{
-        name: 'BTCUSD',
-        last: 32877,
-        change: 1488,
-        high: 33639,
-        low: 30968
-      }, {
-        name: 'ETHUSD',
-        last: 1825.6,
-        change: 54.1,
-        high: 1904,
-        low: 1753
-      }, {
-        name: 'LTCUSD',
-        last: 126.32,
-        change: 4.08,
-        high: 130.52,
-        low: 121
-      }, {
-        name: 'LTCBTC',
-        last: 0.0038322,
-        change: -0.0000698,
-        high: 0.0039407,
-        low: 0.0038195
-      }, {
-        name: 'ETHBTC',
-        last: 0.055492,
-        change: -0.0000698,
-        high: 0.0038195,
-        low: 0.055218
-      }]
+      tradingPairs: []
     };
   },
   methods: {
-    handlePercentage: function handlePercentage(change, last) {
-      var num = (change + last) / last * 100 - 100;
+    handlePercentage: function handlePercentage(num) {
+      num = num * 100;
       return num > 0 ? '+' + num.toFixed(2) + '%' : num.toFixed(2) + '%';
     }
   },
@@ -2428,13 +2405,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _this.tradingPairs.forEach(function (pair) {
-                return pair.changePercentage = _this.handlePercentage(pair.change, pair.last);
-              });
-
               pairs = ["BTCUSD", "LTCUSD", "LTCBTC", "ETHUSD", "ETHBCD"];
 
               _loop = function _loop(i) {
+                var np = {
+                  name: pairs[i],
+                  last: null,
+                  change: null,
+                  changePercentage: null,
+                  high: null,
+                  low: null
+                };
+
+                _this.tradingPairs.push(np);
+
                 var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
                 ws.onopen = function () {
@@ -2448,8 +2432,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 ws.onmessage = function (msg) {
                   var response = JSON.parse(msg.data);
 
-                  if (response[1] != "hb") {
+                  if (response[1] && response[1] != "hb") {
                     console.log(pairs[i], response);
+                    this.tradingPairs[i].lastPrice = response[1][6].toFixed(2);
+                    this.tradingPairs[i].change = response[1][4].toFixed(2);
+                    this.tradingPairs[i].changePercentage = this.handlePercentage(response[1][5]);
+                    this.tradingPairs[i].high = response[1][8].toFixed(2);
+                    this.tradingPairs[i].low = response[1][9].toFixed(2);
                   }
                 };
               };
@@ -2458,7 +2447,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _loop(i);
               }
 
-            case 4:
+            case 3:
             case "end":
               return _context.stop();
           }
@@ -2489,6 +2478,9 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
 //
 //
 //
@@ -7156,7 +7148,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.tableLine2 {\n    display: grid;\n    grid-template-columns: 600px 200px 200px 200px;\n    \n    border: 1px solid black;\n}\n.removeButton {\n    background-color: red;\n    color: white;\n}\n.addButton {\n    background-color: green;\n    color: white;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.table2 {\n    border: 1px solid black;\n    border-radius: 3px;\n    box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.452);\n    padding: 5px;\n}\n.tableLine2 {\n    display: grid;\n    grid-template-columns: 600px 200px 200px 200px;\n    border-bottom: 1px solid gray;\n}\n.removeButton {\n    background-color: red;\n    color: white;\n}\n.addButton {\n    background-color: green;\n    color: white;\n}\n.addButton,.removeButton {\n    height: 30px;\n    margin-top: 10px;\n}\n.addButton:hover,.removeButton:hover {\n    cursor: pointer;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -7180,7 +7172,31 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.tableLine1 {\n    display: grid;\n    grid-template-columns: repeat(6, 200px);\n    \n    border: 1px solid black;\n}\n.entry {\n    justify-content: center;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.table1 {\n    border: 1px solid black;\n    border-radius: 3px;\n    box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.452);\n    padding: 25px;\n}\n.tableLine1 {\n    display: grid;\n    grid-template-columns: repeat(6, 200px);\n    border-bottom: 1px solid gray;\n}\n.entry {\n    justify-content: center;\n}\n.headerTable {\n    font-weight: bold;\n}\n.symbolLink {\n    color: rgb(63, 216, 178);\n    font-weight: bold;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css&":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css& ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.header {\n    display: flex;\n    justify-content: space-between;\n    color: rgb(63, 216, 178);\n    font-weight: bold;\n    padding: 10px;\n    margin-bottom: 10px;\n}\n.login {\n    width: 148px;\n    height: 38px;\n    background-color: rgb(63, 216, 178);\n    color: white;\n    border: 1px solid rgb(63, 216, 178);\n}\n.login:hover {\n    color: rgb(63, 216, 178);\n    background-color: white;\n    border: 1px solid rgb(63, 216, 178);\n    cursor: pointer;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -39029,6 +39045,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_MainComponent_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./MainComponent.vue?vue&type=style&index=0&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_MainComponent_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_MainComponent_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
 /*!****************************************************************************!*\
   !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
@@ -39442,15 +39488,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _MainComponent_vue_vue_type_template_id_3ee370e9___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MainComponent.vue?vue&type=template&id=3ee370e9& */ "./resources/js/components/MainComponent.vue?vue&type=template&id=3ee370e9&");
 /* harmony import */ var _MainComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MainComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/MainComponent.vue?vue&type=script&lang=js&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _MainComponent_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MainComponent.vue?vue&type=style&index=0&lang=css& */ "./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _MainComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
   _MainComponent_vue_vue_type_template_id_3ee370e9___WEBPACK_IMPORTED_MODULE_0__.render,
   _MainComponent_vue_vue_type_template_id_3ee370e9___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
@@ -39558,6 +39606,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css&":
+/*!************************************************************************************!*\
+  !*** ./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css& ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_MainComponent_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./MainComponent.vue?vue&type=style&index=0&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/MainComponent.vue?vue&type=style&index=0&lang=css&");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/Details.vue?vue&type=template&id=5e572aa7&":
 /*!****************************************************************************!*\
   !*** ./resources/js/components/Details.vue?vue&type=template&id=5e572aa7& ***!
@@ -39644,8 +39705,6 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", [
-      _c("h1", [_vm._v("Details")]),
-      _vm._v(" "),
       _c("div", { staticClass: "table2" }, [
         _vm._m(0),
         _vm._v(" "),
@@ -39683,7 +39742,7 @@ var render = function() {
                     staticClass: "addButton",
                     on: { click: _vm.toggleFavorites }
                   },
-                  [_vm._v("Add to favorite")]
+                  [_vm._v("Add to favorites")]
                 )
           ])
         : _vm._e()
@@ -39695,7 +39754,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "tableLine2" }, [
+    return _c("div", { staticClass: "tableLine2 headerTable" }, [
       _c("div", { staticClass: "entry" }, [_vm._v("Symbol")]),
       _vm._v(" "),
       _c("div", { staticClass: "entry" }, [_vm._v("Last Price")]),
@@ -39729,45 +39788,37 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("h1", [_vm._v("Favorites")]),
-    _vm._v(" "),
     _c(
       "div",
       { staticClass: "table1" },
       [
         _vm._m(0),
         _vm._v(" "),
-        _vm._l(_vm.filteredPairs, function(pair) {
-          return _c(
-            "div",
-            { key: pair.name, staticClass: "tableLine1" },
-            [
-              _c("router-link", { attrs: { to: "/details/" + pair.name } }, [
-                _vm._v(_vm._s(pair.name))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.last.toFixed(2)))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.change.toFixed(2)))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.changePercentage))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.high.toFixed(2)))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.low.toFixed(2)))
-              ])
-            ],
-            1
-          )
+        _vm._l(_vm.tradingPairs, function(pair) {
+          return _c("div", { key: pair.name, staticClass: "tableLine1" }, [
+            _c(
+              "div",
+              { staticClass: "entry symbolLink" },
+              [
+                _c("router-link", { attrs: { to: "/details/" + pair.name } }, [
+                  _vm._v(_vm._s(pair.name))
+                ])
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [_vm._v(_vm._s(pair.last))]),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [_vm._v(_vm._s(pair.change))]),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [
+              _vm._v(_vm._s(pair.changePercentage))
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [_vm._v(_vm._s(pair.high))]),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [_vm._v(_vm._s(pair.low))])
+          ])
         })
       ],
       2
@@ -39779,7 +39830,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "tableLine1" }, [
+    return _c("div", { staticClass: "tableLine1 headerTable" }, [
       _c("div", { staticClass: "entry" }, [_vm._v("Name")]),
       _vm._v(" "),
       _c("div", { staticClass: "entry" }, [_vm._v("Last")]),
@@ -39817,8 +39868,6 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("h1", [_vm._v("Home page")]),
-    _vm._v(" "),
     _c(
       "div",
       { staticClass: "table1" },
@@ -39826,36 +39875,30 @@ var render = function() {
         _vm._m(0),
         _vm._v(" "),
         _vm._l(_vm.tradingPairs, function(pair) {
-          return _c(
-            "div",
-            { key: pair.name, staticClass: "tableLine1" },
-            [
-              _c("router-link", { attrs: { to: "/details/" + pair.name } }, [
-                _vm._v(_vm._s(pair.name))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.last.toFixed(2)))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.change.toFixed(2)))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.changePercentage))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.high.toFixed(2)))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "entry" }, [
-                _vm._v(_vm._s(pair.low.toFixed(2)))
-              ])
-            ],
-            1
-          )
+          return _c("div", { key: pair.name, staticClass: "tableLine1" }, [
+            _c(
+              "div",
+              { staticClass: "entry symbolLink" },
+              [
+                _c("router-link", { attrs: { to: "/details/" + pair.name } }, [
+                  _vm._v(_vm._s(pair.name))
+                ])
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [_vm._v(_vm._s(pair.last))]),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [_vm._v(_vm._s(pair.change))]),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [
+              _vm._v(_vm._s(pair.changePercentage))
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [_vm._v(_vm._s(pair.high))]),
+            _vm._v(" "),
+            _c("div", { staticClass: "entry" }, [_vm._v(_vm._s(pair.low))])
+          ])
         })
       ],
       2
@@ -39867,7 +39910,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "tableLine1" }, [
+    return _c("div", { staticClass: "tableLine1 headerTable" }, [
       _c("div", { staticClass: "entry" }, [_vm._v("Name")]),
       _vm._v(" "),
       _c("div", { staticClass: "entry" }, [_vm._v("Last")]),
@@ -39908,26 +39951,27 @@ var render = function() {
     "div",
     { staticClass: "container" },
     [
-      _c(
-        "div",
-        { staticClass: "header" },
-        [
-          _c("router-link", { attrs: { to: "/" } }, [_vm._v("Home")]),
-          _vm._v(" "),
-          _vm.isLoged
-            ? _c("router-link", { attrs: { to: "/favorites" } }, [
-                _vm._v("Favorites")
-              ])
-            : _vm._e(),
-          _vm._v(" "),
-          !_vm.isLoged
-            ? _c("button", { staticClass: "login", on: { click: _vm.logIn } }, [
-                _vm._v("Login")
-              ])
-            : _vm._e()
-        ],
-        1
-      ),
+      _c("div", { staticClass: "header" }, [
+        _c(
+          "div",
+          [
+            _c("router-link", { attrs: { to: "/" } }, [_vm._v("Home")]),
+            _vm._v(" "),
+            _vm.isLoged
+              ? _c("router-link", { attrs: { to: "/favorites" } }, [
+                  _vm._v("Favorites")
+                ])
+              : _vm._e()
+          ],
+          1
+        ),
+        _vm._v(" "),
+        !_vm.isLoged
+          ? _c("button", { staticClass: "login", on: { click: _vm.logIn } }, [
+              _vm._v("Login")
+            ])
+          : _vm._e()
+      ]),
       _vm._v(" "),
       _c("router-view")
     ],
