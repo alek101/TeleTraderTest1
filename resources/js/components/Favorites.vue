@@ -46,31 +46,31 @@ export default {
         }
         else {
             this.isLoged=resr.isLoged;
-        this.favorites=resr.favorites;
-        this.pairs = Object.keys(this.favorites).sort((a,b)=>a.localeCompare(b));
-        const that=this;
-            for(let i=0; i<that.pairs.length; i++){
-            
-            let np = {
-                    name: that.pairs[i],
-                    last: null,
-                    change: null,
-                    changePercentage: null,
-                    high: null,
-                    low: null
-                };
-            that.tradingPairs.push(np);
-            let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
+            this.favorites=resr.favorites;
+            this.pairs = Object.keys(this.favorites).sort((a,b)=>a.localeCompare(b));
+            const that=this;
+                for(let i=0; i<that.pairs.length; i++){
+                
+                let np = {
+                        name: that.pairs[i],
+                        last: null,
+                        change: null,
+                        changePercentage: null,
+                        high: null,
+                        low: null
+                    };
+                that.tradingPairs.push(np);
+                let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
 
-            ws.onopen = function(){
-                ws.send(JSON.stringify({
-                        event: 'subscribe', 
-                    channel: 'ticker', 
-                    symbol: 't'+that.pairs[i], 
-                }));
-            }
+                ws.onopen = function(){
+                    ws.send(JSON.stringify({
+                            event: 'subscribe', 
+                        channel: 'ticker', 
+                        symbol: 't'+that.pairs[i], 
+                    }));
+                }
 
-            ws.onmessage = function(msg){
+                ws.onmessage = function(msg){
                     let response = JSON.parse(msg.data); 
                     if(response[1] && response[1] != "hb")
                     {
@@ -83,8 +83,7 @@ export default {
                 }
             } 
         } 
-    } ,
-
+    } 
 }
 </script>
 

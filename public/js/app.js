@@ -2477,6 +2477,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
                     };
                     that.tradingPairs.push(np);
                     var ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
+                    console.log('NEW WS!!!');
+                    console.log('ws', ws);
 
                     ws.onopen = function () {
                       ws.send(JSON.stringify({
@@ -2488,6 +2490,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
                     ws.onmessage = function (msg) {
                       var response = JSON.parse(msg.data);
+                      console.log('res', ws, response);
 
                       if (response[1] && response[1] != "hb") {
                         that.tradingPairs[i].last = response[1][6].toFixed(2);
@@ -2511,6 +2514,37 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           }
         }
       }, _callee);
+    }))();
+  },
+  beforeDestroy: function beforeDestroy() {
+    var _this2 = this;
+
+    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+      var that, i;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              that = _this2;
+
+              for (i = 0; i < that.pairs.length; i++) {
+                ws.send(JSON.stringify({
+                  event: 'unsubscribe',
+                  channel: 'ticker',
+                  symbol: 't' + that.pairs[i]
+                }));
+
+                ws.onclose = function (event) {
+                  console.log('close', ws, event);
+                };
+              }
+
+            case 2:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, _callee2);
     }))();
   }
 });
