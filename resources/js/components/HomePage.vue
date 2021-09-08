@@ -29,7 +29,8 @@ export default {
      data() {
         return {
             tradingPairs: [],  
-            pairs: []            
+            pairs: [],
+            ws_array:[]            
         }
     },
     methods: {
@@ -37,14 +38,14 @@ export default {
             num = num  *100;
             return num>0? '+'+num.toFixed(2)+'%':num.toFixed(2)+'%';
         },
-    getTopFive(array) {
-        const array2 = array.slice(0,5);
-        const result = [];
-        for(let mem of array2){
-            result.push(mem.toUpperCase());
+        getTopFive(array) {
+            const array2 = array.slice(0,5);
+            const result = [];
+            for(let mem of array2){
+                result.push(mem.toUpperCase());
+            }
+            return result;
         }
-        return result;
-    }
     },
     async beforeMount() {
         const res = await fetch('/api/getSymbols')
@@ -67,8 +68,7 @@ export default {
                     };
                 that.tradingPairs.push(np);
                 let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
-                console.log('NEW WS!!!');
-                console.log('ws',ws)
+                that.ws_array.push(ws);
 
                 ws.onopen = function(){
                     ws.send(JSON.stringify({
@@ -80,7 +80,6 @@ export default {
 
                 ws.onmessage = function(msg){
                     let response = JSON.parse(msg.data);
-                    console.log('res',ws,response)
                     if(response[1] && response[1] != "hb")
                     {
                     that.tradingPairs[i].last = (response[1][6]).toFixed(2);
@@ -94,16 +93,8 @@ export default {
         } 
     },
     async beforeDestroy() {
-        const that = this;
-        for(let i=0; i<that.pairs.length; i++){
-            ws.send(JSON.stringify({
-                event: 'unsubscribe', 
-                channel: 'ticker', 
-                symbol: 't'+that.pairs[i],
-            }));
-            ws.onclose = function(event){
-                console.log('close',ws,event);
-            }
+        for(let ws of this.ws_array){
+            ws.close();
         }
     },     
 }

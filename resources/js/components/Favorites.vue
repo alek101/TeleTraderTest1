@@ -29,7 +29,8 @@ export default {
             tradingPairs: [],
             isLoged: false,
             favorites: {}, 
-            pairs: [],     
+            pairs: [],
+            ws_array:[]      
         }
     },
     methods: {
@@ -61,6 +62,7 @@ export default {
                     };
                 that.tradingPairs.push(np);
                 let ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
+                that.ws_array.push(ws);
 
                 ws.onopen = function(){
                     ws.send(JSON.stringify({
@@ -83,10 +85,11 @@ export default {
                 }
             } 
         } 
-    } 
+    },
+    async beforeDestroy() {
+        for(let ws of this.ws_array){
+            ws.close();
+        }
+    },
 }
 </script>
-
-<style scoped>
-
-</style>
