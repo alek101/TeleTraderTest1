@@ -15,9 +15,7 @@
         name: 'MainComponent',
         data() {
             return {
-                isLoged: false,
-                favorites: {},
-                tradingPairs: [],              
+                isLoged: false,            
             }
         },
         methods: {
@@ -38,7 +36,6 @@
             const res = await fetch('/api/status');
             const data = await res.json();
             this.isLoged=data.isLoged;
-            this.favorites=data.favorites;
         }   
     }
 </script>

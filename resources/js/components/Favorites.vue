@@ -51,7 +51,6 @@ export default {
             this.pairs = Object.keys(this.favorites).sort((a,b)=>a.localeCompare(b));
             const that=this;
                 for(let i=0; i<that.pairs.length; i++){
-                
                 let np = {
                         name: that.pairs[i],
                         last: null,
