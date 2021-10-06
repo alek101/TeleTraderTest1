@@ -2624,9 +2624,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   name: 'MainComponent',
   data: function data() {
     return {
-      isLoged: false,
-      favorites: {},
-      tradingPairs: []
+      isLoged: false
     };
   },
   methods: {
@@ -2681,9 +2679,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 5:
               data = _context2.sent;
               _this2.isLoged = data.isLoged;
-              _this2.favorites = data.favorites;
 
-            case 8:
+            case 7:
             case "end":
               return _context2.stop();
           }
@@ -2792,33 +2789,74 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
-/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
-/* harmony import */ var _components_HomePage_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../components/HomePage.vue */ "./resources/js/components/HomePage.vue");
-/* harmony import */ var _components_Favorites_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Favorites.vue */ "./resources/js/components/Favorites.vue");
-/* harmony import */ var _components_Details_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/Details.vue */ "./resources/js/components/Details.vue");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
+/* harmony import */ var _components_HomePage_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/HomePage.vue */ "./resources/js/components/HomePage.vue");
+/* harmony import */ var _components_Favorites_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/Favorites.vue */ "./resources/js/components/Favorites.vue");
+/* harmony import */ var _components_Details_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/Details.vue */ "./resources/js/components/Details.vue");
 /* provided dependency */ var process = __webpack_require__(/*! process/browser */ "./node_modules/process/browser.js");
 
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
 
-vue__WEBPACK_IMPORTED_MODULE_3__["default"].use(vue_router__WEBPACK_IMPORTED_MODULE_4__["default"]);
+
+
+
+vue__WEBPACK_IMPORTED_MODULE_4__["default"].use(vue_router__WEBPACK_IMPORTED_MODULE_5__["default"]);
 var routes = [{
   path: '/',
   name: 'HomePage',
-  component: _components_HomePage_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+  component: _components_HomePage_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
 }, {
   path: '/favorites',
   name: 'Favorites',
-  component: _components_Favorites_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+  component: _components_Favorites_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+  beforeEnter: function () {
+    var _beforeEnter = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(to, from, next) {
+      var res, resr;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return fetch('/api/status');
+
+            case 2:
+              res = _context.sent;
+              _context.next = 5;
+              return res.json();
+
+            case 5:
+              resr = _context.sent;
+              if (resr.isLoged) next();else router.go('/');
+
+            case 7:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    function beforeEnter(_x, _x2, _x3) {
+      return _beforeEnter.apply(this, arguments);
+    }
+
+    return beforeEnter;
+  }()
 }, {
   path: '/details/:pair',
   name: 'Details',
-  component: _components_Details_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+  component: _components_Details_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
   props: true
 }];
-var router = new vue_router__WEBPACK_IMPORTED_MODULE_4__["default"]({
+var router = new vue_router__WEBPACK_IMPORTED_MODULE_5__["default"]({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: routes

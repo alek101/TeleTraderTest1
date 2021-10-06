@@ -15,7 +15,13 @@ const routes = [
   {
     path: '/favorites',
     name: 'Favorites',
-    component: Favorites
+    component: Favorites,
+    beforeEnter: async (to, from, next) => {
+      const res = await fetch('/api/status');
+      const resr = await res.json();
+      if(resr.isLoged) next();
+      else router.go('/');
+    }
   },
   {
     path: '/details/:pair',
